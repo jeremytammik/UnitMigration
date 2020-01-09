@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>UnitMigration</Text>
+    <Description>Migrate all unit settings from a source RVT to a folder full of target RVT models</Description>
+    <Assembly>UnitMigration.dll</Assembly>
+    <FullClassName>UnitMigration.Command</FullClassName>
+    <ClientId>2381665d-98ae-4ec4-bf41-9b9bf60250ff</ClientId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+</RevitAddIns>
