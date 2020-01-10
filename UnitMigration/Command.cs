@@ -12,7 +12,7 @@ namespace UnitMigration
   [Transaction( TransactionMode.Manual )]
   public class Command : IExternalCommand
   {
-    private const string _taskTitle = "Migrate units";
+    private const string _taskTitle = "Migrate Units";
 
     private const string _fileFilter 
       = "All Revit files (*.rvt, *.rfa, *.rte, *.rft)|*.rvt;*.rfa;*.rte;*.rft";
@@ -22,6 +22,8 @@ namespace UnitMigration
       ref string message, 
       ElementSet elements )
     {
+      // Determine source document and its unit settings
+
       TaskDialogResult result = TaskDialog.Show( _taskTitle, 
         "Select source file for units copy...",
         TaskDialogCommonButtons.Ok 
@@ -52,24 +54,25 @@ namespace UnitMigration
       if( originalUnits == null )
         return Result.Failed;
 
-      ///////////////////////////
-      // target
-      ///////////////////////////
+      // Target
+
       result = TaskDialog.Show( _taskTitle
         , string.Format(
           "You have selected a document in {0} format.\n"
           + "Select target folder to copy units to - "
           + "all files will be upgraded & overwritten!",
           originalDisplayUnits.ToString() )
-        , TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel );
+        , TaskDialogCommonButtons.Ok 
+        | TaskDialogCommonButtons.Cancel );
 
       if( result == TaskDialogResult.Cancel )
         return Result.Cancelled;
 
-      FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog()
-      {
-        ShowNewFolderButton = false,
-      };
+      FolderBrowserDialog folderBrowserDialog
+        = new FolderBrowserDialog()
+        {
+          ShowNewFolderButton = false,
+        };
       DialogResult dialogResult = folderBrowserDialog.ShowDialog();
       if( dialogResult == DialogResult.Cancel )
         return Result.Cancelled;
@@ -79,12 +82,15 @@ namespace UnitMigration
       if( !directoryInfo.Exists )
         return Result.Failed;
 
-      IEnumerable<FileInfo> files = directoryInfo.EnumerateFiles( "*",
-        SearchOption.AllDirectories );
+      IEnumerable<FileInfo> files = directoryInfo
+        .EnumerateFiles( "*", SearchOption.AllDirectories );
+
       foreach( FileInfo file in files )
       {
         Document doc = commandData.Application
-      .OpenAndActivateDocument( file.FullName )?.Document;
+          .OpenAndActivateDocument( file.FullName )
+          ?.Document;
+
         if( doc == null )
           return Result.Failed;
 
@@ -94,16 +100,16 @@ namespace UnitMigration
           originalDoc = null;
         }
 
-        Transaction transaction = new Transaction( doc,
-          "Copy units to target" );
-        transaction.Start();
-        doc.SetUnits( originalUnits );
-        transaction.Commit();
+        using( Transaction t = new Transaction( doc ) )
+        {
+          t.Start( "Copy units to target" );
+          doc.SetUnits( originalUnits );
+          t.Commit();
 
-        doc.Save();
-        originalDoc = doc;
+          doc.Save();
+          originalDoc = doc;
+        }
       }
-
       return Result.Succeeded;
     }
   }

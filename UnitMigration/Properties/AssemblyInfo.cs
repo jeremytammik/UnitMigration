@@ -37,6 +37,7 @@ using System.Runtime.InteropServices;
 //
 // 2020-01-09 2020.0.0.0 initial commit
 // 2020-01-09 2020.0.0.0 integrated code from class UnitMigration module units_migrate\PrecastStartup.cs by Dragos Turmac and Bogdan Teodorescu 
+// 2020-01-10 2020.0.0.0 cleanup and documentation
 //
 [assembly: AssemblyVersion( "2020.0.0.0" )]
 [assembly: AssemblyFileVersion( "2020.0.0.0" )]
